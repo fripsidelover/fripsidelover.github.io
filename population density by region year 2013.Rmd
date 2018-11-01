@@ -1,0 +1,56 @@
+<!--
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Markdown example with knitr and googleVis}
+-->
+
+
+
+```{r setOptions, message=FALSE, echo=FALSE}
+library(googleVis)
+op <- options(gvis.plot.tag='chart')
+```
+
+
+### 지역별 인구밀도 2013년도 - e나라지표
+
+<br> 
+
+* 자료출처:  e-나라지표 > 지표비교 > 부문별지표 > 총량지표 > 국토인구 > 지역현황 > 지역별 인구 및 인구밀도.
+* e-나라지표 홈피 [링크](http://www.index.go.kr/potal/main/PotalMain.do). 
+
+<br>
+
+```{r test, results='asis', echo=FALSE}
+data <- read.csv("pop_by_province.csv", header=F, sep=",")
+
+name <- c("Seoul","Busan","Daegu","Incheon","Gwangju","Daejeon",
+          "Ulsan","Sejong","Gyeonggido","Gangwondo", "Chungcheongbukdo","Chungcheongnamdo",
+          "Jeollabukdodo", "Jeollanamdo","Gyeongsangbukdo","Gyeongsangnamdo", "Jeju","Cap")
+
+region_code <- paste("KR",c(11,26,27,28,29,30,
+                            31,50,41,42,43,44,
+                            45,46,47,48,49,100000),sep="-")
+
+rownames(data) <- name
+colnames(data) <- c("2010 pop","2010 pop_density", "2011 pop","2011 pop_density",
+                    "2012 pop","2012 pop_density", "2013 pop","2013 pop_density")
+data$name <- name
+data$region_code <- region_code
+
+data_13pd <- data[c(8,9,10)]
+data_13pd <- data_13pd[-c(18),]
+
+data_tbl <- data[c(7,8)]
+
+Map <- gvisGeoChart(data_13pd, locationvar="region_code", colorvar="2013 pop_density",
+                    options=list(region="KR",
+                                 displayMode="regions",
+                                 resolution="provinces",
+                                 width=700,
+                                 height=400)
+                    )
+
+tbl <- gvisTable(data_tbl, options=list(height=300,width=200))
+plot(gvisMerge(Map,tbl,horizontal=T))
+
+``````
